@@ -2,7 +2,7 @@ import Product from "../models/product.model.js";
 
 //POST request handler 
 
-const addProduct = async (req, res) => {
+const addProduct = async (req, res, next) => {
     try {
         const { title, price, description, category, image } = req.body || {}
         const product = await Product.create({
@@ -16,15 +16,11 @@ const addProduct = async (req, res) => {
         })
     }
     catch (error) {
-        const statusCode = error.name === "ValidationError" ? 400 : 500;
-        res.status(statusCode).json({
-            success: false,
-            message: error.message
-        })
+        next(error)
     }
 }
 
-const getAllProducts = async (req, res) => {
+const getAllProducts = async (req, res, next) => {
     try {
         const productList = await Product.find()
         res.status(200).json({
@@ -34,37 +30,31 @@ const getAllProducts = async (req, res) => {
         })
     }
     catch (error) {
-        res.status(500).json({
-            success: false,
-            message: " failed in fecthing product "
-        })
+        next(error)
 
     }
 }
 
-const getOneProduct = async (req, res) => {
+const getOneProduct = async (req, res, next) => {
     const { id } = req.params;
     try {
 
         const oneProduct = await Product.findById(id);
         if (!oneProduct) {
-            return res.status(404).json({ message: 'Product not found' })
+            return res.status(404).json({ success: false, message: 'Product not found' })
         }
         return res.status(200).json({
             success: true,
             data: oneProduct,
-            message: 'fetched data sucessfully'
+            message: 'fetched data suceesfully'
         })
     }
     catch (err) {
-        res.status(500).json({
-            success: false,
-            message: "fail in fecthing data"
-        })
+        next(err)
     }
 }
 
-const deleteProduct = async (req, res) => {
+const deleteProduct = async (req, res, next) => {
     try {
 
         const { id } = req.params
@@ -83,15 +73,12 @@ const deleteProduct = async (req, res) => {
 
     }
     catch (error) {
-        res.status(500).json({
-            success: false,
-            message: " fail to delete product "
-        })
+        next(error)
     }
 }
 
 
-const updateProduct = async (req, res) => {
+const updateProduct = async (req, res, next) => {
 
     const { id } = req.params
     try {
@@ -103,7 +90,7 @@ const updateProduct = async (req, res) => {
         );
         if (!updatedProduct) {
             return res.status(404).json({
-                success: true,
+                success: false,
                 message: " product not found"
             })
         }
@@ -114,10 +101,7 @@ const updateProduct = async (req, res) => {
         })
     }
     catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "failed to update "
-        })
+        next(error)
     }
 }
 export { addProduct, getAllProducts, getOneProduct, deleteProduct, updateProduct }

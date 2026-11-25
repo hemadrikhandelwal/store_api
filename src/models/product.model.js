@@ -26,11 +26,14 @@ const productSchema = new mongoose.Schema({
     },
     image: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     }
 },
     { timestamps: true }
 );
+
+
 
 //2. define model - modle name which is of which type 
 
